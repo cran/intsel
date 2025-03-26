@@ -43,9 +43,34 @@ fit <- intsel(x = x,
 fit$iterations
 plot(fit)
 
+
+##################### check weights #####################
+fit.half <- intsel(
+  x = x[1:(n/2), ],
+  y = y[1:(n/2)],
+  p.screen = 5,
+  intercept = intercept,
+  lambda = lambdas
+)
+fit.half$iterations
+plot(fit.half)
+
+fit.weighted <- intsel(
+  x = x,
+  y = y,
+  weights = rep(c(1:0), each = n/2),
+  p.screen = 5,
+  intercept = intercept,
+  lambda = lambdas
+)
+fit.weighted$iterations
+plot(fit.weighted)
+
+identical(fit.half$estimates, fit.weighted$estimates)
+############################################################
 cv <- intsel_cv(x = x,
                 y = y,
-                p.screen =5,
+                p.screen = 5,
                 intercept = intercept,
                 stepsize_init = 1,
                 lambda = lambdas,
@@ -74,3 +99,39 @@ dim(pred)
 newx <- x[sample(1:nrow(x), size = 100), ]
 pred.newx <- predict(fit, newx = newx, type = "link")
 dim(pred.newx)
+
+
+
+
+
+# check weights
+cv.half <- intsel_cv(
+  x = x[(n/2+1):n, ],
+  y = y[(n/2+1):n],
+  p.screen = 5,
+  intercept = intercept,
+  stepsize_init = 1,
+  lambda = lambdas,
+  nfolds = 5,
+  foldid = NULL
+)
+
+plot(cv.half)
+plot(cv.half, type = "solution-path")
+
+cv.weighted <- intsel_cv(
+  x = x,
+  y = y,
+  weights = rep(c(0, 1), each = n/2),
+  p.screen = 5,
+  intercept = intercept,
+  stepsize_init = 1,
+  lambda = lambdas,
+  nfolds = 5,
+  foldid = NULL
+)
+
+plot(cv.weighted)
+plot(cv.weighted, type = "solution-path")
+
+identical(cv.half$intsel.fit$estimates, cv.weighted$intsel.fit$estimates)

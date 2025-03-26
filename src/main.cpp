@@ -73,7 +73,8 @@ void proximalGraph(
 // [[Rcpp::export]]
 Rcpp::NumericVector l_ld(Rcpp::NumericVector& beta,
                          Rcpp::NumericMatrix& x,
-                         Rcpp::NumericVector& y) {
+                         Rcpp::NumericVector& y,
+                         Rcpp::NumericVector& w) {
   int n;
   n = x.nrow();
   
@@ -88,14 +89,16 @@ Rcpp::NumericVector l_ld(Rcpp::NumericVector& beta,
   
   Rcpp::NumericVector xbeta (n);
   
+  double weight_sum = sum(w);
+  
   for (i = 0; i < n; i++) {
     xbeta[i] = sum(x.row(i) * beta);
   }
   
-  lkhd = -sum( - log( 1.0 + exp(xbeta) ) + y * xbeta )/n;
+  lkhd = -sum( w * ( - log( 1.0 + exp(xbeta) ) + y * xbeta) )/weight_sum;
   
   for (i = 0; i < p; i++) {
-    grad[i] = -sum( x.column(i) * (y - 1.0 / (1.0 + exp(-xbeta))) )/n;
+    grad[i] = -sum( w * (x.column(i) * (y - 1.0 / (1.0 + exp(-xbeta)))) )/weight_sum;
   }
   // grad = x * ( 1.0/( 1.0 + exp(-xbeta) ) - y);
   
@@ -109,6 +112,7 @@ Rcpp::NumericVector l_ld(Rcpp::NumericVector& beta,
 // [[Rcpp::export]]
 Rcpp::List intsel_cpp(Rcpp::NumericMatrix& x,
                       Rcpp::NumericVector& y,
+                      Rcpp::NumericVector& w,
                       std::string& regul,
                       Rcpp::NumericVector& lam,
                       Rcpp::IntegerMatrix& grp,
@@ -156,7 +160,7 @@ Rcpp::List intsel_cpp(Rcpp::NumericMatrix& x,
     i = 0;
     
     while (i < maxit) {
-      lkhd_grad = l_ld(beta, x, y);
+      lkhd_grad = l_ld(beta, x, y, w);
       lkhd = lkhd_grad[0];
       grad = lkhd_grad[Rcpp::Range(1, p)];
       
@@ -170,7 +174,7 @@ Rcpp::List intsel_cpp(Rcpp::NumericMatrix& x,
       par_diff = beta_tmp - beta;
       
       // lkhd_grad_tmp = l_ld(beta_tmp, x, n_unique, start, stop, event);
-      lkhd_grad_tmp = l_ld(beta_tmp, x, y);
+      lkhd_grad_tmp = l_ld(beta_tmp, x, y, w);
       lkhd_tmp = lkhd_grad_tmp[0];
       // grad_tmp = lkhd_grad_tmp[Rcpp::Range(1, p)];
       
@@ -190,7 +194,7 @@ Rcpp::List intsel_cpp(Rcpp::NumericMatrix& x,
         par_diff = beta_tmp - beta;
         
         // lkhd_grad_tmp = l_ld(beta_tmp, x, n_unique, start, stop, event);
-        lkhd_grad_tmp = l_ld(beta_tmp, x, y);
+        lkhd_grad_tmp = l_ld(beta_tmp, x, y, w);
         lkhd_tmp = lkhd_grad_tmp[0];
         // grad_tmp = lkhd_grad_tmp[Rcpp::Range(1, p)];
         

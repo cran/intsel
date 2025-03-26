@@ -5,6 +5,7 @@
 #' 
 #' @param x Predictor matrix with dimension \eqn{n * p}, where \eqn{n} is the number of subjects, and \eqn{p} is the number of predictors.
 #' @param y Binary outcome, a vector of length \eqn{n}.
+#' @param weights Optional, observation weights. Default is 1 for all observations.
 #' @param intercept Logical, indicating whether an intercept term should be included in the model. The intercept term will not be penalized. The default is \code{TRUE}.
 #' @param p.screen Number of variables of which all two-way interactions are screened. These variables should be placed in the \code{p.screen} left-most columns of matrix \code{x}.
 #' @param lambda Sequence of regularization coefficients \eqn{\lambda}'s. Will be sorted in a decreasing order.
@@ -64,6 +65,7 @@
 intsel <- function(
     x,
     y,
+    weights,
     intercept = TRUE,
     p.screen,
     lambda,
@@ -74,6 +76,7 @@ intsel <- function(
     maxit = 1000L,
     verbose = FALSE
 ) {
+  if (missing(weights)) weights <- rep(1, nrow(x))
   
   penalty <- "overlapping"
   
@@ -120,6 +123,7 @@ intsel <- function(
 
   fit <- intsel_cpp(x = x,
                     y = y,
+                    w = weights,
                     regul = "graph",
                     lam = lambdas,
                     grp = grp.pars$groups,

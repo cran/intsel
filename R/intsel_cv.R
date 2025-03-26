@@ -5,6 +5,7 @@
 #' 
 #' @param x Predictor matrix with dimension \eqn{n * p}, where \eqn{n} is the number of subjects, and \eqn{p} is the number of predictors.
 #' @param y Binary outcome, a vector of length \eqn{n}.
+#' @param weights Optional, observation weights. Default is 1 for all observations.
 #' @param intercept Logical, indicating whether an intercept term should be included in the model. The intercept term will not be penalized. The default is \code{TRUE}.
 #' @param p.screen Number of variables of which all two-way interactions are screened. These variables should be placed in the \code{p.screen} left-most columns of matrix \code{x}.
 #' @param lambda Sequence of regularization coefficients \eqn{\lambda}'s. Will be sorted in a decreasing order.
@@ -77,6 +78,7 @@
 intsel_cv <- function(
     x,
     y,
+    weights,
     intercept = TRUE,
     p.screen,
     lambda,
@@ -89,6 +91,7 @@ intsel_cv <- function(
     maxit = 1000L,
     verbose = FALSE
 ) {
+  if (missing(weights)) weights <- rep(1, nrow(x))
   
   penalty <- "overlapping"
   
@@ -140,6 +143,7 @@ intsel_cv <- function(
   
   fit <- intsel_cpp(x = x,
                     y = y,
+                    w = weights,
                     regul = "graph",
                     lam = lambdas,
                     grp = grp.pars$groups,
@@ -183,11 +187,14 @@ intsel_cv <- function(
 
     train_x <- x[rows_train, ]
     train_y <- y[rows_train]
+    train_w <- weights[rows_train]
     test_x <- x[!rows_train, ]
     test_y <- y[!rows_train]
+    test_w <- weights[!rows_train]
     
     fit <- intsel_cpp(x = train_x,
                       y = train_y,
+                      w = train_w,
                       regul = "graph",
                       lam = lambdas,
                       grp = grp.pars$groups,
@@ -202,7 +209,7 @@ intsel_cv <- function(
                       maxit = maxit,
                       verbose = verbose)
     
-    cv_error[k, ] <- apply(fit$Estimates, MARGIN = 2, FUN = l_ld, x = test_x, y = test_y)[1, ]
+    cv_error[k, ] <- apply(fit$Estimates, MARGIN = 2, FUN = l_ld, x = test_x, y = test_y, w = test_w)[1, ]
     iterations[k, ] <- fit$Iterations
   }
   

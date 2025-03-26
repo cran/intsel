@@ -1,8 +1,8 @@
 Package: intsel
 Type: Package
 Title: Interaction Selection in Logistic Regression
-Version: 1.0
-Date: 2025-03-06
+Version: 1.0.1
+Date: 2025-03-26
 Authors@R: c(person("Yi", "Lian", role = c("aut", "cre"), email = "yi.lian@pennmedicine.upenn.edu"),
              person("Tianze", "Jiao", role = "aut"),
              person("Guanbo", "Wang", role = "aut"),
@@ -20,7 +20,7 @@ Config/testthat/edition: 3
 RoxygenNote: 7.3.1
 Copyright: file inst/COPYRIGHTS
 NeedsCompilation: yes
-Packaged: 2025-03-07 14:17:12 UTC; YLIAN
+Packaged: 2025-03-26 22:34:54 UTC; YLIAN
 Author: Yi Lian [aut, cre],
   Tianze Jiao [aut],
   Guanbo Wang [aut],
@@ -29,4 +29,4 @@ Author: Yi Lian [aut, cre],
   Yuansi Chen [ctb]
 Maintainer: Yi Lian <yi.lian@pennmedicine.upenn.edu>
 Repository: CRAN
-Date/Publication: 2025-03-10 14:50:26 UTC
+Date/Publication: 2025-03-26 22:50:04 UTC

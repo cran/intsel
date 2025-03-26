@@ -7,6 +7,7 @@
 intsel(
   x,
   y,
+  weights,
   intercept = TRUE,
   p.screen,
   lambda,
@@ -22,6 +23,8 @@ intsel(
 \item{x}{Predictor matrix with dimension \eqn{n * p}, where \eqn{n} is the number of subjects, and \eqn{p} is the number of predictors.}
 
 \item{y}{Binary outcome, a vector of length \eqn{n}.}
+
+\item{weights}{Optional, observation weights. Default is 1 for all observations.}
 
 \item{intercept}{Logical, indicating whether an intercept term should be included in the model. The intercept term will not be penalized. The default is \code{TRUE}.}
 
